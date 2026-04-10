@@ -18,7 +18,7 @@ set -e
 
 : ${DEFAULT_WIN32_WINNT:=0x601}
 : ${DEFAULT_MSVCRT:=ucrt}
-: ${MINGW_W64_VERSION:=0d6dfbc348dfad714761c0a7151615767f96bcb5}
+: ${MINGW_W64_VERSION:=dbbc8e99d9b85408f2c0a5565cb689c44eef0650}
 
 CFGUARD_FLAGS="--enable-cfguard"
 
@@ -87,7 +87,7 @@ unset CC
 : ${CORES:=$(nproc 2>/dev/null)}
 : ${CORES:=$(sysctl -n hw.ncpu 2>/dev/null)}
 : ${CORES:=4}
-: ${ARCHS:=${TOOLCHAIN_ARCHS-i686 x86_64 armv7 aarch64 arm64ec}}
+: ${ARCHS:=${TOOLCHAIN_ARCHS-x86_64}}
 
 if [ -z "$SKIP_INCLUDE_TRIPLET_PREFIX" ]; then
     HEADER_ROOT="$PREFIX/generic-w64-mingw32"
@@ -116,28 +116,9 @@ if [ -z "$SKIP_INCLUDE_TRIPLET_PREFIX" ]; then
     done
 fi
 
-ARM64X_FLAGS=""
-for arch in $ARCHS; do
-    case $arch in
-    arm64ec) ARM64X_FLAGS="--enable-arm64x" ;;
-    esac
-done
-
 cd mingw-w64-crt
 for arch in $ARCHS; do
     case $arch in
-    armv7)
-        FLAGS="--disable-lib32 --disable-lib64 --enable-libarm32"
-        ;;
-    aarch64)
-        FLAGS="--disable-lib32 --disable-lib64 --enable-libarm64 $ARM64X_FLAGS"
-        ;;
-    arm64ec)
-        continue
-        ;;
-    i686)
-        FLAGS="--enable-lib32 --disable-lib64"
-        ;;
     x86_64)
         FLAGS="--disable-lib32 --enable-lib64"
         ;;
