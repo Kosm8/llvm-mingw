@@ -16,8 +16,8 @@
 
 set -e
 
-: ${SQLITE_VERSION:=3490200}
-: ${SQLITE_YEAR:=2025}
+: ${SQLITE_VERSION:=3530000}
+: ${SQLITE_YEAR:=2026}
 
 : ${LLVM_PROFILE_DATA_DIR:=/tmp/llvm-profile}
 : ${LLVM_PROFDATA_FILE:=profile.profdata}
@@ -38,7 +38,7 @@ fi
 : ${CORES:=$(nproc 2>/dev/null)}
 : ${CORES:=$(sysctl -n hw.ncpu 2>/dev/null)}
 : ${CORES:=4}
-: ${ARCHS:=${TOOLCHAIN_ARCHS-i686 x86_64 armv7 aarch64 arm64ec}}
+: ${ARCHS:=${TOOLCHAIN_ARCHS-x86_64}}
 
 download() {
     if command -v curl >/dev/null; then
