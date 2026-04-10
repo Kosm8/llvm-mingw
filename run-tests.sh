@@ -27,7 +27,7 @@ export PATH=$PREFIX/bin:$PATH
 : ${CORES:=$(nproc 2>/dev/null)}
 : ${CORES:=$(sysctl -n hw.ncpu 2>/dev/null)}
 : ${CORES:=4}
-: ${ARCHS:=${TOOLCHAIN_ARCHS-i686 x86_64 armv7 aarch64 arm64ec}}
+: ${ARCHS:=${TOOLCHAIN_ARCHS-x86_64}}
 
 MAKE=make
 if command -v gmake >/dev/null; then
@@ -93,50 +93,10 @@ set_native() {
     arch="$1"
     winbuild="$2"
     case $arch in
-    i686)
-        NATIVE_X86=1
-        RUN_I686=true
-        ;;
     x86_64)
         NATIVE_X86=1
         RUN_I686=true
         RUN_X86_64=true
-        ;;
-    armv7)
-        ;;
-    aarch64)
-        # Windows/ARM64 can run i686 binaries. Not setting NATIVE_X86 - the
-        # asan tests don't run correctly when emulated on ARM64.
-        NATIVE_AARCH64=1
-        RUN_I686=true
-        RUN_AARCH64=true
-
-        if [ -n "$winbuild" ] && [ "$winbuild" -ge 22000 ]; then
-            # Since Windows 11, x86_64 binaries can also be emulated.
-            RUN_X86_64=true
-            # arm64ec can also be executed (as it is part of being able to
-            # execute x86_64).
-            RUN_ARM64EC=true
-            NATIVE_ARM64EC=1
-        fi
-        if [ -n "$winbuild" ] && [ "$winbuild" -lt 26100 ]; then
-            # Since Windows 11 24H2 armv7 binaries can no longer be
-            # executed. (It is also possible to be unable to run armv7
-            # binaries on older OS versions, if the hardware is incapable
-            # of it, like on Apple Silicon macs.)
-            NATIVE_ARMV7=1
-            RUN_ARMV7=true
-        fi
-
-        if [ -z "$IS_UCRT" ]; then
-            # If targeting msvcrt.dll, skip executing the x86 binaries
-            # emulated. They do run, but statically linked mingw math
-            # functions fail some tests, when running emulated; those functions
-            # rely on 80 bit long doubles actually having more precision than
-            # 64 bit doubles.
-            unset RUN_I686
-            unset RUN_X86_64
-        fi
         ;;
     esac
 }
@@ -170,10 +130,6 @@ if [ -z "$RUN_X86_64" ] && [ -z "$RUN_I686" ] && [ -z "$RUN_ARMV7" ] && [ -z "$R
             # binaries.
             set_native x86_64
             ;;
-        armv7|aarch64)
-            # Busybox uname -v prints the plain build number, like "22000".
-            set_native aarch64 "$(uname -v)"
-            ;;
         esac
         ;;
     Linux)
@@ -193,12 +149,6 @@ if [ -z "$RUN_X86_64" ] && [ -z "$RUN_I686" ] && [ -z "$RUN_ARMV7" ] && [ -z "$R
                 : ${RUN_X86_64:=wine}
                 : ${RUN_I686:=wine}
                 ;;
-            aarch64)
-                # Don't assume that the installed Wine can run armv7 binaries
-                # too. (Versions since Wine 10.2 can, if both an armv7 and
-                # aarch64 version is installed together.)
-                : ${RUN_AARCH64:=wine}
-                ;;
             esac
         fi
         ;;
@@ -211,14 +161,6 @@ for arch in $ARCHS; do
     HAVE_UBSAN=1
     HAVE_OPENMP=1
     case $arch in
-    i686)
-        RUN="$RUN_I686"
-        COPY="$COPY_I686"
-        NATIVE="$NATIVE_X86"
-        if [ -n "$IS_UCRT" ]; then
-            HAVE_ASAN=1
-        fi
-        ;;
     x86_64)
         RUN="$RUN_X86_64"
         COPY="$COPY_X86_64"
@@ -226,23 +168,6 @@ for arch in $ARCHS; do
         if [ -n "$IS_UCRT" ]; then
             HAVE_ASAN=1
         fi
-        ;;
-    armv7)
-        RUN="$RUN_ARMV7"
-        COPY="$COPY_ARMV7"
-        NATIVE="$NATIVE_ARMV7"
-        ;;
-    aarch64)
-        RUN="$RUN_AARCH64"
-        COPY="$COPY_AARCH64"
-        NATIVE="$NATIVE_AARCH64"
-        ;;
-    arm64ec)
-        unset HAVE_UBSAN
-        unset HAVE_OPENMP
-        RUN="$RUN_ARM64EC"
-        COPY="$COPY_ARM64EC"
-        NATIVE="$NATIVE_ARM64EC"
         ;;
     esac
 
