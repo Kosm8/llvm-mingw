@@ -17,14 +17,16 @@
 set -e
 
 : ${LLVM_REPOSITORY:=https://github.com/llvm/llvm-project.git}
-: ${LLVM_VERSION:=llvmorg-22.1.8}
+: ${LLVM_VERSION:=ca7933e47d3a3451d81e72ac174dcb5aa28b59d1}
 ASSERTS=OFF
 unset HOST
 BUILDDIR="build"
 LINK_DYLIB=ON
+FULL_LLVM=1
 ASSERTSSUFFIX=""
 LLDB=ON
 CLANG_TOOLS_EXTRA=ON
+NO_LLVM_TOOL_REUSE=1
 INSTRUMENTED=OFF
 
 while [ $# -gt 0 ]; do
@@ -400,7 +402,7 @@ cmake \
     -DLLVM_ENABLE_ASSERTIONS=$ASSERTS \
     -DLLVM_ENABLE_PROJECTS="$PROJECTS" \
     -DLLVM_ENABLE_BINDINGS=OFF \
-    -DLLVM_TARGETS_TO_BUILD="ARM;AArch64;X86;NVPTX" \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_INSTALL_TOOLCHAIN_ONLY=$TOOLCHAIN_ONLY \
     -DLLVM_LINK_LLVM_DYLIB=$LINK_DYLIB \
     -DLLVM_TOOLCHAIN_TOOLS="llvm-ar;llvm-ranlib;llvm-objdump;llvm-rc;llvm-cvtres;llvm-nm;llvm-strings;llvm-readobj;llvm-dlltool;llvm-pdbutil;llvm-objcopy;llvm-strip;llvm-cov;llvm-profdata;llvm-addr2line;llvm-symbolizer;llvm-windres;llvm-ml;llvm-readelf;llvm-size;llvm-cxxfilt;llvm-lib" \
