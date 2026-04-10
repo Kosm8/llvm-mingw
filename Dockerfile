@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:devel
 
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND="noninteractive" apt-get install -qqy --no-install-recommends \
@@ -16,7 +16,7 @@ WORKDIR /build
 
 ENV TOOLCHAIN_PREFIX=/opt/llvm-mingw
 
-ARG TOOLCHAIN_ARCHS="i686 x86_64 armv7 aarch64 arm64ec"
+ARG TOOLCHAIN_ARCHS="x86_64"
 
 ARG DEFAULT_CRT=ucrt
 

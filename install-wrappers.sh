@@ -42,7 +42,7 @@ fi
 mkdir -p "$PREFIX"
 PREFIX="$(cd "$PREFIX" && pwd)"
 
-: ${ARCHS:=${TOOLCHAIN_ARCHS-i686 x86_64 armv7 aarch64 arm64ec}}
+: ${ARCHS:=${TOOLCHAIN_ARCHS-x86_64}}
 : ${TARGET_OSES:=${TOOLCHAIN_TARGET_OSES-mingw32 mingw32uwp}}
 
 if [ -n "$HOST" ] && [ -z "$CC" ]; then
@@ -54,12 +54,14 @@ if [ -n "$HOST" ]; then
     case $HOST in
     *-mingw32)
         EXEEXT=.exe
+        TARGET_WINDOWS=1
         ;;
     esac
 else
     case $(uname) in
     MINGW*)
         EXEEXT=.exe
+        TARGET_WINDOWS=1
         ;;
     esac
 fi
