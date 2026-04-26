@@ -14,7 +14,7 @@ jobs:
   # slightly more, when we know a separate build of the same version but with
   # assertions enabled, has passed some amount of tests.
   prepare:
-    if: (github.event_name != 'schedule') || (github.repository == 'Kosm8/llvm-mingw')
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     outputs:
       LLVM_VERSION: ${{steps.get-versions.outputs.LLVM_VERSION}}
@@ -61,7 +61,7 @@ jobs:
 
   linux-stage1:
     needs: [prepare]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Build
@@ -93,7 +93,7 @@ jobs:
 
   linux-profile:
     needs: [prepare, linux-stage1]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8
@@ -124,7 +124,7 @@ jobs:
   # Build a cross compiler for Linux, targeting Windows.
   linux:
     needs: [prepare, linux-stage1, linux-profile]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8

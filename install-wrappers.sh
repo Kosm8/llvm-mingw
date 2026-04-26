@@ -54,12 +54,14 @@ if [ -n "$HOST" ]; then
     case $HOST in
     *-mingw32)
         EXEEXT=.exe
+        TARGET_WINDOWS=1
         ;;
     esac
 else
     case $(uname) in
     MINGW*)
         EXEEXT=.exe
+        TARGET_WINDOWS=1
         ;;
     esac
 fi
