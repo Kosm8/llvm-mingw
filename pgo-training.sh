@@ -16,7 +16,7 @@
 
 set -e
 
-: ${SQLITE_VERSION:=3530100}
+: ${SQLITE_VERSION:=3530300}
 : ${SQLITE_YEAR:=2026}
 
 : ${LLVM_PROFILE_DATA_DIR:=/tmp/llvm-profile}
